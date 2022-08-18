@@ -1,27 +1,16 @@
 import streamlit as st
+st.set_page_config(
+    page_title = "Xulutions Clinic Helpers",layout="wide"
+)
 
-st.header("Transform your texts")
 from datetime import datetime as dt
 from datetime import timedelta as td
 
+from letter import letter_app
 
-# Transform Texts
-font_size = "12px"
-p_normal = f"<p style='font-size:{font_size};' align='justify'>"
-p_bold = f"<p style='font-size:{font_size}; font-weight: bold' align='justify'>"
-p_bold_underlined = f"<p style='font-size:{font_size}; font-weight: bold;text-decoration:underline' align='justify'>"
-p_close = "</p>"
-INPUT_AREA_HEIGHT = 200
+letter_app()
 
 
-raw = st.text_area("Enter Text to remove spaces:", height = INPUT_AREA_HEIGHT)
-if raw:
-    st.write(raw)
-    processed = raw.replace("Befund:", f"{p_bold_underlined}Befund:{p_close}{p_normal}")
-    processed = processed.replace("Histologie:", f"{p_bold_underlined}Beurteilung:{p_close}{p_normal}")
-    processed = processed.replace("Beurteilung:", f"{p_bold_underlined}Beurteilung:{p_close}{p_normal}")
-    processed = processed.replace("Beurteilung vorläufig:", f"{p_bold_underlined}Beurteilung:{p_close}{p_normal}")
-    st.markdown(processed, unsafe_allow_html=True)
 
 
 # Kostaufbau
