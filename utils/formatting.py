@@ -1,5 +1,6 @@
 REPORT_HEADERS = [
     "Histologie:",
+    "Befund:",
     "Beurteilung:",
     "Beurteilung vorläufig:",
     "Beurteilung endgültig:",

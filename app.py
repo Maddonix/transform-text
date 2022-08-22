@@ -11,8 +11,6 @@ from letter import letter_app
 letter_app()
 
 
-
-
 # Kostaufbau
 st.header("Kostaufbau")
 select_kostaufbau = st.radio("Select Kostaufbau", ("Kostaufbau 1", "Kostaufbau 2", "Kostaufbau 3"))
