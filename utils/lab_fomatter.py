@@ -53,8 +53,8 @@ def split_lab_text_by_date(text, re_timestamp = RE_TIMESTAMP):
 
 def get_ref_range(value):
     result = {
-        "lower": None,
-        "upper": None,
+        "ref_lower": None,
+        "ref_upper": None,
         "info": None
     }
 
@@ -69,8 +69,8 @@ def get_ref_range(value):
 
     ref = re.findall(r"(\[.+\])", value)[0].replace("[", "").replace("]", "").strip()
     ref = ref.split("-")
-    result["lower"] = float(ref[0])
-    result["upper"] = float(ref[1])
+    result["ref_lower"] = float(ref[0])
+    result["ref_upper"] = float(ref[1])
 
     return result
 
@@ -97,8 +97,8 @@ def read_text_lab_value(value):
     _ref_str = value.split(":")[1]
 
     result.update(get_ref_range(_ref_str))
-
-    result["value"] = re.findall(r"(:\s*\d*\.*\d*\s*)", value)[0].replace(": ", "").replace("[", "")
-
+    v_in = value.replace("<", "").replace(">","")
+    v = re.findall(r"(:\s*\d*\.*\d*\s*)", value)[0].replace(": ", "").replace("[", "").strip()
+    result["value"] = float(v)
 
     return result
