@@ -90,7 +90,7 @@ class Patient(BaseModel):
 
         # Befunde
         [_.parse() for _ in self.befunde]
-        content["Befunde"] = "<\n>".join([_.markdown_text for _ in self.befunde])
+        content["Befunde"] = "<\\n>".join([_.markdown_text for _ in self.befunde])
 
         # Labor
         self.lab.get_df()

@@ -31,6 +31,7 @@ LOOKUP_UNITS = {
     'MCV': 'fl',
     'Mittleres Plättchenvolumen': 'fl',
     'Natrium': 'mmol/l',
+    "Magnesium": "mmol/l",
     'PTT': 's',
     'Ratio int. norm.': '',
     'Thromboplastinzeit n. Quick': '%',
@@ -85,15 +86,19 @@ def read_text_lab_value(value):
     }
 
     l_type = value.split(":")[0]
-
-    if not l_type in LOOKUP_UNITS:
-        result["info"] = value
-        return result
+    result["type"] = l_type
+    if l_type in LOOKUP_UNITS:
+        result["unit"] = LOOKUP_UNITS[l_type]
+    else:
+        result["unit"] = "NOT DEFINED YET"
+    #     result["info"] = value
+        
+        # return result
 
     
 
-    result["type"] = l_type
-    result["unit"] = LOOKUP_UNITS[l_type]
+    
+    
     _ref_str = value.split(":")[1]
 
     result.update(get_ref_range(_ref_str))

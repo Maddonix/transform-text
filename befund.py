@@ -9,12 +9,7 @@ from datetime import datetime as dt
 # }
 
 HEADERS = [
-    "Histologie",
-    "Befund",
-    "Beurteilung",
-    "Beurteilung vorläufig",
-    "Beurteilung endgültig",
-    "Empfehlung"
+
 ]
 
 SUBHEADERS = [
@@ -25,7 +20,13 @@ SUBHEADERS = [
     "Magen",
     "Ösophagus",
     "Duodenum",
-    "Komplikation"
+    "Komplikation",
+    "Histologie",
+    "Befund",
+    "Beurteilung",
+    "Beurteilung vorläufig",
+    "Beurteilung endgültig",
+    "Empfehlung"
 ]
 
 
@@ -38,7 +39,7 @@ class Befund(BaseModel):
 
     def parse(self):
         title_line = self.text.split(":")[0]
-        date = re.findall("(/d+\./d+.d+)", title_line)
+        date = re.findall("(/d+\./d+\.d+)", title_line)
         text = self.text
         text = text.replace("\n", " ")
         if len(date):
@@ -46,7 +47,7 @@ class Befund(BaseModel):
             _ = date.split(".")
             date = dt(_[-1], _[-2], [-3])
             
-            text.replace(title_line, return_bold(return_underlined(title_line))+"<br>")
+            text.replace(title_line, return_italic(return_underlined(title_line))+"<p>")
         for header in HEADERS:
             if header in text:
                 text = text.replace(header+":", f"<br><br>{header+':'}<br>")
