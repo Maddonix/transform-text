@@ -3,7 +3,7 @@ from typing import List, Optional, Union
 from datetime import datetime as dt
 from datetime import timedelta as td
 import streamlit as st
-from utils.formatting import return_bold, return_underlined, return_italic
+from utils.formatting import return_bold, return_underlined, return_italic, font_size
 
 KOSTAUFBAU_DICT={
     0: {
@@ -148,24 +148,25 @@ class Procedere(BaseModel):
             appointments.append(text)
         
         # procedere_text = return_bold(return_underlined("Procedere:"))+"<br>"
-        procedere_text = "<ul>"
-        procedere_text += f"<li>{return_bold('Sofortige Vorstellung in der Notaufnahme bei Auftreten von Fieber, SChüttelfrost, ausgeprägten abdominellen Schmerzen oder Blutungszeichen')}</li>"
+        procedere_text = f"<ul style='font-size:{font_size};'>"
+        procedere_text += f"<li style='font-size:{font_size};'>{return_bold('Sofortige Vorstellung in der Notaufnahme bei Auftreten von Fieber, SChüttelfrost, ausgeprägten abdominellen Schmerzen oder Blutungszeichen')}</li>"
 
         if appointments:
-            app_text = "<ul>"+"".join(appointments)+"</ul>"
-            app_text = f"<li>Wiedervorstellung:<br>{app_text}</li>"
+            app_text = f"<ul style='font-size:{font_size};'>"+"".join(appointments)+"</ul>"
+            app_text = f"<li style='font-size:{font_size};'><b><u>Wiedervorstellung:</b></u><br>{app_text}</li>"
 
             procedere_text += app_text
 
         text = ""
         for k in self.kostaufbau.texts:
-            text += f"<li>{k}</li>"
+            text += f"<li style='font-size:{font_size};'>{k}</li>"
 
         if text:
-            text = return_bold(return_underlined("<li>Kostaufbau:"))+"<br>" f"<ul>{text}</ul></li>"
+            text = return_bold(return_underlined(f"<li style='font-size:{font_size};'>Kostaufbau:"))+"<br>" f"<ul>{text}</ul></li>"
             procedere_text += text
         
         
         procedere_text += "</ul>"
+        procedere_text = f"<div style='font-size:{font_size};'>" + procedere_text + "</div>"
 
         return procedere_text

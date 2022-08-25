@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime as dt
+from utils.formatting import font_size
 from typing import Optional, List
 
 class Treatment(BaseModel):
@@ -18,13 +19,13 @@ class Treatment(BaseModel):
             # print(self.complications)
             c_text = ""
             for _ in self.complications:
-                c_text+=f"<li>{_}</li>"
+                c_text+=f"<li style='font-size:{font_size}'>{_}</li>"
 
-            c_text = "<ul>"+c_text+"</ul>"
+            c_text = f"<ul style='font-size:{font_size}'>"+c_text+"</ul>"
             # print(c_text)
 
             text += c_text
 
-        text = "<li>" + text + "</li>"
+        text = f"<li style='font-size:{font_size}'>" + text + "</li>"
 
         return text

@@ -111,7 +111,7 @@ class LaborText(BaseModel):
         measurements = [Measurement(**_) for _ in self.lab_dicts]
         return measurements
     
-
+import streamlit as st
 class Measurement(BaseModel):
     type: str
     value: float
@@ -144,4 +144,14 @@ class PatientLab(BaseModel):
         ref_df = pd.DataFrame.from_dict(refs, orient="index")
 
 
-        self.df = df.merge(ref_df, left_index=True, right_index=True)
+        df = df.merge(ref_df, left_index=True, right_index=True)
+
+        new_colnames = []
+        for col in df.columns:
+            if isinstance(col, dt):
+                col = col.strftime("%d.%m.%y %H:%M")
+            new_colnames.append(col)
+
+        df.columns = new_colnames
+
+        self.df = df

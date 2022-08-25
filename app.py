@@ -1,3 +1,4 @@
+from re import T
 import streamlit as st
 st.set_page_config(
     page_title = "Xulutions Clinic Helpers",layout="wide"
@@ -6,7 +7,16 @@ st.set_page_config(
 from diagnose import DiagnosenText
 from patient import Patient
 from labor import LaborText, PatientLab
-from utils.formatting import header
+from utils.formatting import header, font_size
+
+st.markdown("""
+<style>
+table {
+  font-size: 13px;
+}
+</style>
+""", unsafe_allow_html=True
+)
 
 TEST_LAB_TEXT = """
 (18.08.2022 12:29:00)
@@ -76,7 +86,7 @@ with e_procedere:
     
 letter = patient.generate_letter()
 st.markdown(letter, unsafe_allow_html=True)
-st.markdown(header("Labor:"), unsafe_allow_html=True)
-st.table(patient.lab.df.style.format(precision=2, na_rep="-"))
+st.markdown(header(f"<div style='font-size:{font_size};'>Labor"+ "</div>"), unsafe_allow_html=True) 
+st.table(patient.lab.df.style.format({"font-size": 12}, precision=2, na_rep="-"))
 # st.markdown(letter, unsafe_allow_html=True)
 

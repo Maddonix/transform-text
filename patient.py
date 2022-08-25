@@ -7,7 +7,7 @@ from befund import Befund
 from procedere import Procedere
 from labor import PatientLab
 from typing import Optional
-from utils.formatting import header, paragraph
+from utils.formatting import header, paragraph, font_size
 from epikrise import generate_epikrise
 
 class Patient(BaseModel):
@@ -15,8 +15,8 @@ class Patient(BaseModel):
 
     male: bool = False      # General attributes
 
-    az: str = "gutem"         # General attributes
-    az_options = ["gutem", "adäquatem", "reduziertem"]
+    az: str = "guter"         # General attributes
+    az_options = ["guter", "adäquater", "reduzierter"]
 
     cvrf: List[str] = []    # General attributes
     cvrf_options = ["Rauchen", "art. Hypertonie", "Adipositas", "Z.n. MI", "Z.n. Apoplex"]
@@ -78,7 +78,8 @@ class Patient(BaseModel):
 
         # Diagnosen
         _ = [_.parse_html() for _ in self.diagnoses]
-        _ = "<ul>"+"".join(_)+"</ul>"
+        # _ = "<ul>"+"".join(_)+"</ul>" #f"<div style='font-size:{font_size}px;><ul>"+"".join(_)+"</ul></div>"
+        _ = f"<ul style='font-size:{font_size}'>"+"".join(_)+"</ul>"
         content["Diagnosen"] = _
 
         # Epikrise
@@ -89,7 +90,7 @@ class Patient(BaseModel):
 
         # Befunde
         [_.parse() for _ in self.befunde]
-        content["Befunde"] = "<br><br>".join([_.markdown_text for _ in self.befunde])
+        content["Befunde"] = "<\n>".join([_.markdown_text for _ in self.befunde])
 
         # Labor
         self.lab.get_df()

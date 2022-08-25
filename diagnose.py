@@ -3,7 +3,7 @@ from datetime import datetime as dt
 from typing import Optional, List
 from treatment import Treatment
 import re
-from utils.formatting import return_underlined, return_bold, return_italic
+from utils.formatting import return_underlined, return_bold, return_italic, font_size
 import streamlit as st
 
 FLAG_DIAGNOSE_DATE = [
@@ -64,7 +64,7 @@ class DiagnosenText(BaseModel):
     text: str
     snippets: List[str] = []
 
-    snippet_pattern: str = "text (?P<text>[^;]*);|typ (?P<typ>haupt);|therapie(?P<verlauf>[^;]*);"
+    snippet_pattern: str = "text (?P<text>[^;]*);|typ (?P<typ>haupt);|verlauf(?P<verlauf>[^;]*);"
     snippet_order: List[str] = ["text", "typ", "verlauf"]
 
     def text_to_snippets(self):
@@ -76,7 +76,6 @@ class DiagnosenText(BaseModel):
         jsons = []
 
         for snippet in snippets:
-            st.write(snippet)
             r = split_snippet(snippet, self.snippet_pattern)
             new = {"text": None, "primary": False, "verlauf": []}
             for match_tuple in r:
@@ -109,14 +108,6 @@ class Diagnose(BaseModel):
     verlauf: List[Treatment] = []
 
     def parse_html(self):
-        template = """
-        <li>
-            DIAGNOSE
-            <ul>
-                VERAUFSITEMS
-            </ul>
-        </li>
-        """
 
         text = self.text
         if self.diagnose_date:
@@ -125,11 +116,11 @@ class Diagnose(BaseModel):
         verlauf = ""
         for _ in self.verlauf:
             verlauf+= _.parse_html()
-            print(verlauf)
+            # print(verlauf)
         
-        verlauf = "<ul>"+verlauf+"</ul>"
+        verlauf = f"<ul style='font-size:{font_size}'>"+verlauf+"</ul>"
         text+=verlauf
-        text = "<li>"+text+"</li>"
+        text = f"<li style='font-size:{font_size}'>"+text+"</li>"
 
         return text
         

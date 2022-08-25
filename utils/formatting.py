@@ -26,7 +26,7 @@ def set_font_size(text, size):
 
 
 def header(text):
-    return f"{return_bold(return_underlined(text))}:<br>"
+    return f"{return_bold(return_underlined(text))}<br>"
 
 def paragraph(title, text):
-    return f"{header(title)}{text}<br><br>"
+    return f"<p style='font-size:{font_size};' align='justify'>{header(title)}{text}</p>"
