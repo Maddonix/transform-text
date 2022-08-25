@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 from typing import Optional, List
 from utils.formatting import return_bold, return_underlined, return_italic
-
+import re
+from datetime import datetime as dt
 # B_TYPE_HEADER = {
 #     "Koloskopie": [],
 #     "Gastroskopie": [],
@@ -36,8 +37,16 @@ class Befund(BaseModel):
     b_type: Optional[str]
 
     def parse(self):
+        title_line = self.text.split(":")[0]
+        date = re.findall("(/d+\./d+.d+)", title_line)
         text = self.text
         text = text.replace("\n", " ")
+        if len(date):
+            date=date[0]
+            _ = date.split(".")
+            date = dt(_[-1], _[-2], [-3])
+            
+            text.replace(title_line, return_bold(return_underlined(title_line))+"<br>")
         for header in HEADERS:
             if header in text:
                 text = text.replace(header+":", f"<br><br>{header+':'}<br>")

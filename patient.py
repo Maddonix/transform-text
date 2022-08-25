@@ -88,7 +88,8 @@ class Patient(BaseModel):
         content["Procedere"] = self.procedere.parse()
 
         # Befunde
-        content["Befunde"] = "<br><br>".join(self.befunde)
+        [_.parse() for _ in self.befunde]
+        content["Befunde"] = "<br><br>".join([_.markdown_text for _ in self.befunde])
 
         # Labor
         self.lab.get_df()
