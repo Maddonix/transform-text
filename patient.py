@@ -57,7 +57,7 @@ class Patient(BaseModel):
     def get_befunde(self):
         befunde = []        
         if st.button("Befund hinzufügen"):
-            self.befunde.append(Befund(text=""))
+            self.befunde.append(Befund(text="", options=self.options))
 
         for i, b in enumerate(self.befunde):
             befunde.append(st.text_area(f"Befund {i}", value=b.text))

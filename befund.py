@@ -30,13 +30,13 @@ class Befund(BaseModel):
             date = dt(_[-1], _[-2], [-3])
             
             text.replace(title_line, return_italic(return_underlined(title_line))+"<p>")
-        for header in HEADERS:
+        for header in self.options.befund_headers:
             if header in text:
                 text = text.replace(header+":", f"<br><br>{header+':'}<br>")
                 text = text.replace(header+":", return_bold(header+':'))
                 text = text.replace(header+":", return_underlined(header+':'))
 
-        for subheader in SUBHEADERS:
+        for subheader in self.options.befund_subheaders:
             if subheader in text:
                 text = text.replace(subheader+":", f"<br>{subheader+':'}")
                 text = text.replace(subheader+":", return_italic(subheader+':'))
