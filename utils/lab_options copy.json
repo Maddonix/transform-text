@@ -1,0 +1,42 @@
+{
+    "units": {
+        "Alk. Phosphatase": "U/l",
+        "C-reaktives Protein": "mg/dl",
+        "Calcium": "mmol/l",
+        "Creatinin": "mg/dl",
+        "Erythrozyten": "n*10E6/µl",
+        "GGT": "U/l",
+        "GOT (ASAT)": "U/l",
+        "GPT (ALAT)": "U/l",
+        "Gesamt-Bilirubin": "mg/dl",
+        "Harnstoff": "mg/dl",
+        "Hämatokrit": "%",
+        "Hämoglobin": "g/dl",
+        "Kalium": "mmol/l",
+        "Lactat Dehydrogenase": "U/l",
+        "Leukozyten": "n*1000/µl",
+        "Lipase": "U/l",
+        "MCH (HbE)": "pg",
+        "MCHC": "g/dl",
+        "MCV": "fl",
+        "Mittleres Plättchenvolumen": "fl",
+        "Natrium": "mmol/l",
+        "PTT": "s",
+        "Ratio int. norm.": "",
+        "Thromboplastinzeit n. Quick": "%",
+        "Thrombozyten": "n*1000/µl",
+        "anorg. Phosphat": "mmol/l",
+        "glomerul. Filtrationsr. (MDRD)": "ml/min /1,73qm",
+        "glomerul. Filtrationsr. CKD-EP": "ml/min /1,73qm"
+    },
+    "rm_flags": [
+        "Akutbestimmungen / TDM / Drogen:",
+        "Hämatologie:",
+        "Klinische Chemie:",
+        "Gerinnung:"
+        ],
+    "replace_unit_values": {
+        "C-reaktives Protein": [[">", ""], ["<", ""], [" ", ""]]
+    }
+
+}

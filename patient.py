@@ -9,6 +9,7 @@ from labor import PatientLab
 from typing import Optional
 from utils.formatting import header, paragraph, font_size
 from epikrise import generate_epikrise
+from options import Options
 
 class Patient(BaseModel):
     age: int = 60           # General attributes
@@ -26,8 +27,12 @@ class Patient(BaseModel):
 
     befunde: List[Befund] = []
 
-    procedere: Procedere = Procedere()
+    procedere: Optional[Procedere]
 
+    options: Options
+
+    def init_proc(self):
+        self.procedere = Procedere(options = self.options)
 
     def get_general_attributes(self):
         self.age = st.number_input("Alter", value=self.age)

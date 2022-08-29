@@ -3,6 +3,7 @@ import streamlit as st
 st.set_page_config(
     page_title = "Xulutions Clinic Helpers",layout="wide"
 )
+from options import Options
 
 from diagnose import DiagnosenText
 from patient import Patient
@@ -38,55 +39,74 @@ Akutbestimmungen / TDM / Drogen: C-reaktives Protein: < 0.10 [0 - 0.5] mg/dl;
 
 TEST_DIAGNOSEN_TEXT = """
 diagnose text Kolonpolypen; typ haupt; 
-therapie text fraktionierte schlingenresektion! datum 21.03.1234!; 
-therapie text clip applikation! diagnose text arterielle hypertonie; 
+verlauf text fraktionierte schlingenresektion! datum 21.03.1234!; 
+verlauf text clip applikation! diagnose text arterielle hypertonie; 
 diagnose text Coxarthrose beidseits; therapie 2004 Hüft TEP li; 
-therapie text hüft tep re! komplikation Peroneusparese;"""
+verlauf text hüft tep re! komplikation Peroneusparese;"""
 
-cols = st.columns(3)
+sb = st.sidebar
 
-with cols[0]:
-    e_general = st.expander("Allgemein", expanded=True)
-    e_diagnosen = st.expander("Diagnosen", expanded=True)
-    e_befunde = st.expander("Befunde", expanded=True)
-with cols[1]:
-    e_laborwerte = st.expander("Laborwerte", expanded=True)
-    e_epicrisis = st.expander("Epicrisis", expanded=True)
-    e_procedere = st.expander("Procedere", expanded=True)
+with st.sidebar:
+    st.header("Navigation")
+    selection = st.radio("Navigation", ["Patienten", "Optionen"])
 
-if not "patient" in st.session_state:
-    st.session_state.patient = Patient()
-patient = st.session_state.patient
+if not "options" in st.session_state:
+    st.session_state.options = Options()
+    st.session_state.options.load()
+    # st.session_state.options.load
 
-with e_general:
-    patient.get_general_attributes()
+if selection == "Optionen":
+    if st.button("Refresh Options"):
+        st.session_state.options.load()
+    options = st.session_state.options
+    options.get_form()
 
-with e_diagnosen:
-    d_text_input = st.text_area("Diagnosen", TEST_DIAGNOSEN_TEXT, height = 200)
-    diagnose_text = DiagnosenText(text=d_text_input)
-    patient.diagnoses = diagnose_text.get_diagnose_list()
-    d_html = [_.parse_html() for _ in patient.diagnoses]
-    d_html = "<ul>"+"".join(d_html)+"</ul>"
+else:
+    cols = st.columns(3)
 
-with e_befunde:
-    patient.get_befunde()
+    with cols[0]:
+        e_general = st.expander("Allgemein", expanded=True)
+        e_diagnosen = st.expander("Diagnosen", expanded=True)
+        e_befunde = st.expander("Befunde", expanded=True)
+    with cols[1]:
+        e_laborwerte = st.expander("Laborwerte", expanded=True)
+        e_epicrisis = st.expander("Epicrisis", expanded=True)
+        e_procedere = st.expander("Procedere", expanded=True)
 
-with e_laborwerte:
-    lab_in = st.text_area("Laborwerte (Freitext)", TEST_LAB_TEXT, height=200)
-    lab_text = LaborText(raw_text = lab_in)
-    measurements = lab_text.export_patient_lab()
-    patient.lab = PatientLab(measurements=measurements)
-    patient.lab.get_df()
+    if not "patient" in st.session_state:
+        st.session_state.patient = Patient(options = st.session_state.options)
+        st.session_state.patient.init_proc()
+    patient = st.session_state.patient
+
+    with e_general:
+        patient.get_general_attributes()
+
+    with e_diagnosen:
+        d_text_input = st.text_area("Diagnosen", TEST_DIAGNOSEN_TEXT, height = 200)
+        diagnose_text = DiagnosenText(text=d_text_input)
+        patient.diagnoses = diagnose_text.get_diagnose_list()
+        d_html = [_.parse_html() for _ in patient.diagnoses]
+        d_html = "<ul>"+"".join(d_html)+"</ul>"
+
+    with e_befunde:
+        patient.get_befunde()
+
+    with e_laborwerte:
+        lab_in = st.text_area("Laborwerte (Freitext)", TEST_LAB_TEXT, height=200)
+        lab_text = LaborText(raw_text = lab_in,options=patient.options)
+        measurements = lab_text.export_patient_lab()
+        patient.lab = PatientLab(measurements=measurements)
+        patient.lab.get_df()
 
 
 
-with e_procedere:
-    patient.get_procedere()
-    text = patient.procedere.parse()
-    
-letter = patient.generate_letter()
-st.markdown(letter, unsafe_allow_html=True)
-st.markdown(header(f"<div style='font-size:{font_size};'>Labor"+ "</div>"), unsafe_allow_html=True) 
-st.table(patient.lab.df.style.format({"font-size": 12}, precision=2, na_rep="-"))
-# st.markdown(letter, unsafe_allow_html=True)
+    with e_procedere:
+        patient.get_procedere()
+        text = patient.procedere.parse()
+        
+    letter = patient.generate_letter()
+    st.markdown(letter, unsafe_allow_html=True)
+    st.markdown(header(f"<div style='font-size:{font_size};'>Labor"+ "</div>"), unsafe_allow_html=True) 
+    st.table(patient.lab.df.style.format({"font-size": 12}, precision=2, na_rep="-"))
+    # st.markdown(letter, unsafe_allow_html=True)
 

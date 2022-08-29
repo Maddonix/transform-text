@@ -3,51 +3,10 @@ from typing import List, Optional
 from datetime import datetime as dt
 from utils.lab_fomatter import get_timestamps, read_text_lab_value
 import pandas as pd
+from options import Options
 
 
-
-REMOVE_LAB_FLAGS = [
-    "Akutbestimmungen / TDM / Drogen:",
-    "Hämatologie:",
-    "Klinische Chemie:",
-    "Gerinnung:",
-]
 RE_TIMESTAMP = r"(\(\d{2}\.\d{2}.\d{4} \d{2}:\d{2}:\d{2}\))"
-
-LOOKUP_UNITS = {
-    'Alk. Phosphatase': 'U/l',
-    'C-reaktives Protein': 'mg/dl',
-    'Calcium': 'mmol/l',
-    'Creatinin': 'mg/dl',
-    'Erythrozyten': 'n*10E6/µl',
-    'GGT': 'U/l',
-    'GOT (ASAT)': 'U/l',
-    'GPT (ALAT)': 'U/l',
-    'Gesamt-Bilirubin': 'mg/dl',
-    'Harnstoff': 'mg/dl',
-    'Hämatokrit': '%',
-    'Hämoglobin': 'g/dl',
-    'Kalium': 'mmol/l',
-    'Lactat Dehydrogenase': 'U/l',
-    'Leukozyten': 'n*1000/µl',
-    'Lipase': 'U/l',
-    'MCH (HbE)': 'pg',
-    'MCHC': 'g/dl',
-    'MCV': 'fl',
-    'Mittleres Plättchenvolumen': 'fl',
-    'Natrium': 'mmol/l',
-    'PTT': 's',
-    'Ratio int. norm.': '',
-    'Thromboplastinzeit n. Quick': '%',
-    'Thrombozyten': 'n*1000/µl',
-    'anorg. Phosphat': 'mmol/l',
-    'glomerul. Filtrationsr. (MDRD)': 'ml/min /1,73qm',
-    'glomerul. Filtrationsr. CKD-EP': 'ml/min /1,73qm'
-}
-
-LOOKUP_REPLACES = {
-    "C-reaktives Protein": [(">", ""), ("<", ""), (" ", "")],
-}
 
 class LaborText(BaseModel):
     raw_text: str
@@ -57,13 +16,18 @@ class LaborText(BaseModel):
     timestamps: Optional[List[dt]]
 
 
+    options: Options
     PLACEHOLDER_DATE: str = "__XX__XX__XX__"
     TEXT_TIMESTAMP_FORMAT: str = "(%d.%m.%Y %H:%M:%S)"
+
+    class Config:
+        arbitrary_types_allowed = True
+
 
     def remove_lab_flags(self):
         self.get_timestamps()
         text = self.raw_text
-        for flag in REMOVE_LAB_FLAGS:
+        for flag in self.options.rm_flags:
             text = text.replace(flag, "")
 
         for timestamp in self.timestamps:
@@ -94,7 +58,7 @@ class LaborText(BaseModel):
             _new = []
             for _ in lab_values:
                 try:
-                    _new.append(read_text_lab_value(_))
+                    _new.append(read_text_lab_value(_, self.options.units))
                     _new[-1].update({"timestamp": key})
                 except:
                     print(f"ERROR FOR STRING: {_}")

@@ -3,7 +3,8 @@ from typing import List, Optional, Union
 from datetime import datetime as dt
 from datetime import timedelta as td
 import streamlit as st
-from utils.formatting import return_bold, return_underlined, return_italic, font_size
+from utils.formatting import return_bold, return_underlined, return_italic, font_size, return_list_element, return_list
+from options import Options
 
 KOSTAUFBAU_DICT={
     0: {
@@ -49,12 +50,24 @@ class Kostaufbau(BaseModel):
     texts: List[str] = []
 
     def get_kostaufbau(self):
+        self.texts = []
         _dict = KOSTAUFBAU_DICT[self.category]
         for key, value in _dict.items():
             if key == "Kostaufbau": pass
             if self.start_date == (self.start_date+value): pass
             else: 
                 self.texts.append(f"{key}: {(self.start_date + value).strftime('%d.%m.%Y')}")
+                
+
+    def parse(self):
+        st.write(self.texts)
+        self.get_kostaufbau()
+        text = ""
+        for _ in self.texts:
+            text+=return_list_element(_)
+        text = return_list(text)
+        text = return_bold("Kostaufbau")+return_list(text)
+        return text
 
 class Appointment(BaseModel):
     stay_type: str = "ambulant"
@@ -74,7 +87,7 @@ class Appointment(BaseModel):
 
     def add_lab(self, lab = "Blutbild, Gerinnung"):
         if st.button("Add Lab", key=f"add_lab_{self.number}"):
-            text = f"Bitte bringen Sie aktuelle (max. 7 Tage, {lab}) mit"
+            text = f"Bitte bringen Sie aktuelle Laborwerte mit (max. 7 Tage, {lab})"
             self.comments.append(text)
 
     def add_appointment_prep(self):
@@ -110,12 +123,32 @@ class Appointment(BaseModel):
         self.add_comment("Bemerkungen")
         self.drop_last_comment()
 
+    def parse(self):
+        if isinstance(self.date, str):
+            date = dt.strptime(self.date, "%d.%m.%Y")
+        else: date = self.date
 
+        header = f"Termin ({self.stay_title}):"
+        text = f"Bitte erscheinen Sie am {date.strftime('%d.%m.%Y')} ({self.stay_type}) {self.prepare} im {self.location}"
+        text = return_list_element(text)
+        comments = ""
+        for _ in self.comments:
+            comments += return_list_element(_)
+        # comments = return_list(comments)
+        text = return_list(text+comments)
+
+        # text = return_list(text)
+        text = header+ text
+        
+        return text
 
 class Procedere(BaseModel):
     appointments: List[Appointment] = []
     kostaufbau: Kostaufbau = Kostaufbau(category=0)
+    
 
+    options: Options
+    bausteine: List[str] = []
 
     def get_procedere(self):
         stay_title = st.text_input("Termin Grund")
@@ -128,45 +161,31 @@ class Procedere(BaseModel):
         kost_cat = st.radio("Kostaufbau", KOSTAUFBAU_DICT.keys(), key = "kost_cat")
         self.kostaufbau=Kostaufbau(category=kost_cat)
         self.kostaufbau.get_kostaufbau()
+        
+        self.bausteine = st.multiselect("Bausteine", list(self.options.procedere_bausteine.keys()), key = "bausteine")
 
     def parse(self):
-        procedere = ""
-        proc_elements = []
-        appointments = []
-        kostaufbau = []
+        appointments = self.appointments
 
-        for appointment in self.appointments:
-            if isinstance(appointment.date, str):
-                date = dt.strptime(appointment.date, "%d.%m.%Y")
-            else: date = appointment.date
-
-            text = f"<li>Bitte erscheinen Sie am {date.strftime('%d.%m.%Y')} ({appointment.stay_type}) {appointment.prepare} im {appointment.location}</li>"
-            for _ in appointment.comments:
-                text += f"<li>{_}</li>"
-
-            text = f"<li>Termin {appointment.number} {appointment.stay_title}:<ul>{text}</ul></li>"
-            appointments.append(text)
+        procedere_elements = []
         
         # procedere_text = return_bold(return_underlined("Procedere:"))+"<br>"
-        procedere_text = f"<ul style='font-size:{font_size};'>"
-        procedere_text += f"<li style='font-size:{font_size};'>{return_bold('Sofortige Vorstellung in der Notaufnahme bei Auftreten von Fieber, SChüttelfrost, ausgeprägten abdominellen Schmerzen oder Blutungszeichen')}</li>"
+        procedere_elements.append(return_bold('Sofortige Vorstellung in der Notaufnahme bei Auftreten von Fieber, Schüttelfrost, ausgeprägten abdominellen Schmerzen oder Blutungszeichen'))
+        for a in appointments:
+            _a = a.parse()
+            procedere_elements.append(_a)
 
-        if appointments:
-            app_text = f"<ul style='font-size:{font_size};'>"+"".join(appointments)+"</ul>"
-            app_text = f"<li style='font-size:{font_size};'><b><u>Wiedervorstellung:</b></u><br>{app_text}</li>"
+        if self.kostaufbau.category > 0:
+            procedere_elements.append(self.kostaufbau.parse())
 
-            procedere_text += app_text
 
-        text = ""
-        for k in self.kostaufbau.texts:
-            text += f"<li style='font-size:{font_size};'>{k}</li>"
-
-        if text:
-            text = return_bold(return_underlined(f"<li style='font-size:{font_size};'>Kostaufbau:"))+"<br>" f"<ul>{text}</ul></li>"
-            procedere_text += text
-        
-        
-        procedere_text += "</ul>"
-        procedere_text = f"<div style='font-size:{font_size};'>" + procedere_text + "</div>"
+        for _ in self.bausteine:
+            procedere_elements.append(self.options.procedere_bausteine[_])
+        procedere_text = ""
+        for _ in procedere_elements:
+            if not _.startswith("<ul>"):
+                procedere_text += return_list_element(_)
+            else: procedere_text += _
+        procedere_text = return_list(procedere_text)
 
         return procedere_text

@@ -7,27 +7,8 @@ from datetime import datetime as dt
 #     "Koloskopie": [],
 #     "Gastroskopie": [],
 # }
+from options import Options
 
-HEADERS = [
-
-]
-
-SUBHEADERS = [
-    "Indikation",
-    "Prämedikation",
-    "Colon",
-    "Kolon",
-    "Magen",
-    "Ösophagus",
-    "Duodenum",
-    "Komplikation",
-    "Histologie",
-    "Befund",
-    "Beurteilung",
-    "Beurteilung vorläufig",
-    "Beurteilung endgültig",
-    "Empfehlung"
-]
 
 
 
@@ -36,6 +17,7 @@ class Befund(BaseModel):
     date: Optional[str]
     markdown_text: Optional[str]
     b_type: Optional[str]
+    options: Options
 
     def parse(self):
         title_line = self.text.split(":")[0]
