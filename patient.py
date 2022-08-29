@@ -62,7 +62,7 @@ class Patient(BaseModel):
         for i, b in enumerate(self.befunde):
             befunde.append(st.text_area(f"Befund {i}", value=b.text))
 
-        self.befunde = [Befund(text=_) for _ in befunde]
+        self.befunde = [Befund(text=_, options = self.options) for _ in befunde]
 
         return self.befunde
 
